@@ -1,0 +1,231 @@
+import WaitlistForm from "@/components/WaitlistForm";
+
+function CheckIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+export default function Home() {
+  return (
+    <>
+      <nav className="navbar">
+        <div className="navbar-inner">
+          <a href="#" className="logo">
+            <div className="logo-icon">M</div>
+            Munene AI
+          </a>
+          <ul className="nav-links">
+            <li>
+              <a href="#how-it-works">Jinsi Inavyofanya</a>
+            </li>
+            <li>
+              <a href="#pricing">Bei</a>
+            </li>
+            <li>
+              <a href="#waitlist" className="nav-cta">
+                Jiunge Sasa
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <section className="hero">
+        <div className="hero-inner">
+          <div className="hero-badge">
+            <span />
+            Inapatikana kwenye WhatsApp
+          </div>
+          <h1>Simamia Biashara Yako Kwa Simu</h1>
+          <p className="hero-subtitle">
+            The AI business advisor in your WhatsApp
+          </p>
+          <a href="#waitlist" className="hero-cta">
+            Jiunge Sasa — Ni Bure Kuanza
+          </a>
+          <a href="/chat" className="hero-cta" style={{backgroundColor: "#fff", color: "#1a6b3c", marginTop: "12px", display: "inline-block"}}>
+            Jaribu Munene AI →
+          </a>
+          <div className="hero-trust">
+            <div className="hero-trust-item">
+              <CheckIcon />
+              Kwa wafanyabiashara wadogo
+            </div>
+            <div className="hero-trust-item">
+              <CheckIcon />
+              Hakuna programu ya kupakua
+            </div>
+            <div className="hero-trust-item">
+              <CheckIcon />
+              Futa wakati wowote
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="how-it-works" id="how-it-works">
+        <div className="section-inner">
+          <span className="section-label">Jinsi Inavyofanya</span>
+          <h2 className="section-title">Rahisi Sana — Hatua 3 Tu</h2>
+          <p className="section-desc">
+            Hakuna hesabu ngumu. Tumia WhatsApp tu, kama unavyozungumza na
+            rafiki.
+          </p>
+          <div className="steps">
+            <div className="step">
+              <div className="step-number">1</div>
+              <h3>Tuma Mauzo Yako Kila Siku</h3>
+              <p>
+                Send your daily sales on WhatsApp. Andika tu &quot;Leo nimeuza
+                bidhaa za KSh 5,000&quot; — AI inaelewa.
+              </p>
+            </div>
+            <div className="step">
+              <div className="step-number">2</div>
+              <h3>AI Inafuatilia Kila Kitu</h3>
+              <p>
+                AI tracks everything automatically. Mauzo, matumizi, na faida —
+                yote yameandikwa bila kazi yako.
+              </p>
+            </div>
+            <div className="step">
+              <div className="step-number">3</div>
+              <h3>Pata Ripoti na Ushauri</h3>
+              <p>
+                Get weekly profit reports and smart advice. Jua biashara yako
+                inaenda wapi na nini cha kuboresha.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="pricing" id="pricing">
+        <div className="section-inner">
+          <span className="section-label">Bei</span>
+          <h2 className="section-title section-title--center">
+            Bei Rahisi, Thamani Kubwa
+          </h2>
+          <p className="section-desc section-desc--center">
+            Kwa bei ya chakula cha mchana, pata msaidizi wa biashara kila siku.
+          </p>
+          <div className="pricing-card">
+            <p className="plan-name">Mpango wa Mwezi</p>
+            <div className="pricing-amount">
+              <span className="currency">KSh</span>
+              <span className="price">299</span>
+              <span className="period">/month</span>
+            </div>
+            <p className="pricing-note">Cancel anytime — hakuna mkataba</p>
+            <ul className="pricing-features">
+              <li>
+                <CheckIcon />
+                Ufuatiliaji wa mauzo kila siku
+              </li>
+              <li>
+                <CheckIcon />
+                Ripoti ya faida kila wiki
+              </li>
+              <li>
+                <CheckIcon />
+                Ushauri wa biashara kutoka AI
+              </li>
+              <li>
+                <CheckIcon />
+                Inafanya kazi kwenye WhatsApp
+              </li>
+            </ul>
+            <a href="#waitlist" className="pricing-cta">
+              Jiunge Sasa
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section className="waitlist" id="waitlist">
+        <div className="waitlist-wrapper">
+          <span className="section-label">Orodha ya Kusubiri</span>
+          <h2 className="section-title">Jiunge na Wafanyabiashara Wengine</h2>
+          <p className="section-desc">
+            Jaza fomu hapa chini na tutakujulisha tutakapoanza.
+          </p>
+          <WaitlistForm />
+        </div>
+      </section>
+
+      <footer className="footer">
+        <div className="footer-inner">
+          <div className="footer-top">
+            <div className="footer-brand">
+              <a href="#" className="logo">
+                <div className="logo-icon">M</div>
+                Munene AI
+              </a>
+              <p>
+                Msaidizi wa biashara unaotumia akili bandia, moja kwa moja
+                kwenye WhatsApp yako. Kwa wamiliki wa duka, kioski, na
+                wafanyabiashara wadogo nchini Kenya.
+              </p>
+            </div>
+            <div className="footer-links">
+              <h4>Ukurasa</h4>
+              <ul>
+                <li>
+                  <a href="#how-it-works">Jinsi Inavyofanya</a>
+                </li>
+                <li>
+                  <a href="#pricing">Bei</a>
+                </li>
+                <li>
+                  <a href="#waitlist">Jiunge Sasa</a>
+                </li>
+              </ul>
+            </div>
+            <div className="footer-links">
+              <h4>Mawasiliano</h4>
+              <ul>
+                <li>
+                  <a href="mailto:hello@muneneai.co.ke">jacmwnaiki@gmail.com</a>
+                </li>
+                <li>
+                  <a
+                    href="https://wa.me/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    WhatsApp
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div className="footer-bottom">
+            <span>&copy; 2026 Munene AI. Haki zote zimehifadhiwa.</span>
+            <span>Made with ❤️ in Kenya</span>
+          </div>
+          <div className="footer-credit">
+            <a
+              href="https://nex-chi-six.vercel.app/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Built by Jackson_Mwaniki_Munene
+            </a>
+          </div>
+        </div>
+      </footer>
+    </>
+  );
+}
