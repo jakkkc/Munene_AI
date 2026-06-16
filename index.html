@@ -516,6 +516,41 @@
       transform: translateY(0);
     }
 
+    .submit-btn:disabled {
+      background: var(--gray-500);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .submit-btn:disabled:hover {
+      background: var(--gray-500);
+      transform: none;
+    }
+
+    .form-message {
+      margin-top: 1rem;
+      padding: 0.85rem 1rem;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-align: center;
+      display: none;
+    }
+
+    .form-message--success {
+      display: block;
+      background: var(--green-100);
+      color: var(--green-900);
+      border: 1px solid var(--green-500);
+    }
+
+    .form-message--error {
+      display: block;
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fca5a5;
+    }
+
     /* Footer */
     .footer {
       background: var(--green-900);
@@ -750,7 +785,7 @@
       <span class="section-label">Orodha ya Kusubiri</span>
       <h2 class="section-title">Jiunge na Wafanyabiashara Wengine</h2>
       <p class="section-desc">Jaza fomu hapa chini na tutakujulisha tutakapoanza.</p>
-      <form action="#" method="POST">
+      <form id="waitlist-form" novalidate>
         <div class="form-group">
           <label for="name">Jina Lako</label>
           <input type="text" id="name" name="name" placeholder="Mfano: Jane Wanjiku" required>
@@ -759,7 +794,8 @@
           <label for="whatsapp">Nambari ya WhatsApp</label>
           <input type="tel" id="whatsapp" name="whatsapp" placeholder="Mfano: 0712 345 678" required>
         </div>
-        <button type="submit" class="submit-btn">Jiunge Sasa</button>
+        <button type="submit" id="waitlist-submit" class="submit-btn">Jiunge Sasa</button>
+        <div id="form-message" class="form-message" role="alert"></div>
       </form>
     </div>
   </section>
@@ -800,6 +836,60 @@
       </div>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var SUPABASE_URL = 'https://kmrlyiopqckennjijqry.supabase.co/rest/v1/waitlist';
+      var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imttcmx5aW9wcWNrZW5uamlqcXJ5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2MDI1MTAsImV4cCI6MjA5NzE3ODUxMH0.cXbbZg67EX6ki-1_byt5MiqSdSdih34ygWhdWoC4v_Y';
+
+      var form = document.getElementById('waitlist-form');
+      var submitBtn = document.getElementById('waitlist-submit');
+      var messageEl = document.getElementById('form-message');
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        var name = form.name.value.trim();
+        var whatsapp = form.whatsapp.value.trim();
+
+        if (!name || !whatsapp) {
+          return;
+        }
+
+        messageEl.textContent = '';
+        messageEl.className = 'form-message';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Inasubiri...';
+
+        fetch(SUPABASE_URL, {
+          method: 'POST',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ name: name, whatsapp: whatsapp })
+        })
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error('Request failed');
+            }
+            messageEl.textContent = 'Asante! Tutakuwasiliana nawe hivi karibuni 🎉';
+            messageEl.className = 'form-message form-message--success';
+            form.reset();
+          })
+          .catch(function () {
+            messageEl.textContent = 'Hitilafu imetokea. Jaribu tena.';
+            messageEl.className = 'form-message form-message--error';
+          })
+          .finally(function () {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Jiunge Sasa';
+          });
+      });
+    })();
+  </script>
 
 </body>
 </html>
