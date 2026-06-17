@@ -14,9 +14,57 @@ export async function GET(request: NextRequest) {
   return new NextResponse("Forbidden", { status: 403 });
 }
 
-// Receive incoming WhatsApp messages
+// Receive and reply to incoming WhatsApp messages
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  console.log("Incoming WhatsApp message:", JSON.stringify(body, null, 2));
-  return NextResponse.json({ status: "ok" });
+
+  try {
+    const entry = body.entry?.[0];
+    const change = entry?.changes?.[0];
+    const message = change?.value?.messages?.[0];
+
+    if (!message || message.type !== "text") {
+      return NextResponse.json({ status: "ok" });
+    }
+
+    const userText = message.text.body;
+    const userPhone = message.from;
+    const phoneNumberId = change.value.metadata.phone_number_id;
+
+    // Get AI response from Munene AI
+    const aiResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_APP_URL}/api/chat`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userText }),
+      }
+    );
+
+    const aiData = await aiResponse.json();
+    const reply = aiData.reply || "Samahani, jaribu tena.";
+
+    // Send reply back on WhatsApp
+    await fetch(
+      `https://graph.facebook.com/v20.0/${phoneNumberId}/messages`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`,
+        },
+        body: JSON.stringify({
+          messaging_product: "whatsapp",
+          to: userPhone,
+          type: "text",
+          text: { body: reply },
+        }),
+      }
+    );
+
+    return NextResponse.json({ status: "ok" });
+  } catch (error) {
+    console.error("Webhook error:", error);
+    return NextResponse.json({ status: "ok" });
+  }
 }
