@@ -8,6 +8,16 @@ type Message = {
   content: string;
 };
 
+function getUserId(): string {
+  if (typeof window === "undefined") return "web-user";
+  let id = localStorage.getItem("munene-user-id");
+  if (!id) {
+    id = "web-" + Math.random().toString(36).slice(2);
+    localStorage.setItem("munene-user-id", id);
+  }
+  return id;
+}
+
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -28,6 +38,7 @@ export default function ChatPage() {
     if (!input.trim() || loading) return;
 
     const userMessage = input.trim();
+    const userId = getUserId();
     setInput("");
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setLoading(true);
@@ -36,7 +47,7 @@ export default function ChatPage() {
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({ message: userMessage, phone: userId }),
       });
 
       const data = await response.json();
@@ -198,6 +209,7 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "15px",
     lineHeight: "1.5",
     boxShadow: "0 1px 2px rgba(0,0,0,0.15)",
+    whiteSpace: "pre-wrap",
   },
   inputArea: {
     display: "flex",

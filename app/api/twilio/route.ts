@@ -4,7 +4,10 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const userMessage = formData.get("Body") as string;
-    const userPhone = formData.get("From") as string;
+    const rawPhone = formData.get("From") as string;
+
+    // Clean phone number - remove "whatsapp:" prefix
+    const userPhone = rawPhone?.replace("whatsapp:", "") || "unknown";
 
     if (!userMessage) {
       return new NextResponse("", { status: 200 });
