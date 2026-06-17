@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// Meta webhook verification
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const mode = searchParams.get("hub.mode");
@@ -14,7 +13,6 @@ export async function GET(request: NextRequest) {
   return new NextResponse("Forbidden", { status: 403 });
 }
 
-// Receive and reply to incoming WhatsApp messages
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
@@ -28,21 +26,22 @@ export async function POST(request: NextRequest) {
     }
 
     const userText = message.text.body;
-    const userPhone = message.from;
+    const userPhone = message.from; // This is their real WhatsApp number
     const phoneNumberId = change.value.metadata.phone_number_id;
 
-    // Get AI response from Munene AI
-    const aiResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/chat`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userText }),
-      }
-    );
+    // Get AI response — pass phone number so AI knows who is talking
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL;
+    const aiResponse = await fetch(`${appUrl}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        message: userText,
+        phone: userPhone  // Each user gets their own history
+      }),
+    });
 
     const aiData = await aiResponse.json();
-    const reply = aiData.reply || "Samahani, jaribu tena.";
+    const reply = aiData.reply || "Samahani, jaribu tena. 🙏";
 
     // Send reply back on WhatsApp
     await fetch(
