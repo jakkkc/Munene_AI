@@ -18,11 +18,8 @@ async function supabaseFetch(path: string, options: RequestInit = {}) {
 }
 
 async function getOrCreateUser(phone: string) {
-  // Check if user exists
   const users = await supabaseFetch(`users?phone=eq.${phone}&limit=1`);
   if (users.length > 0) return users[0];
-
-  // Create new user
   const newUsers = await supabaseFetch("users", {
     method: "POST",
     body: JSON.stringify({ phone }),
@@ -64,38 +61,54 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing or invalid message" }, { status: 400 });
     }
 
-    // Get user and sales history
     await getOrCreateUser(phone);
     const salesHistory = await getSalesHistory(phone);
 
-    // Build history context
     const historyContext = salesHistory.length > 0
-      ? `Here is this user's sales history (most recent first):
-${salesHistory.map((s: {created_at: string, raw_message: string, total_revenue: number}) => 
-  `- ${new Date(s.created_at).toLocaleDateString('en-KE')}: ${s.raw_message} (Revenue: KSh ${s.total_revenue})`
+      ? `Hii ni historia ya mauzo ya mtumiaji huyu (kutoka ya hivi karibuni):
+${salesHistory.map((s: { created_at: string; raw_message: string; total_revenue: number }) =>
+  `- ${new Date(s.created_at).toLocaleDateString('en-KE')}: ${s.raw_message} (Mapato: KSh ${s.total_revenue})`
 ).join('\n')}`
-      : "This is a new user with no sales history yet.";
+      : "Mtumiaji mpya — bado hana historia ya mauzo.";
 
-    const systemPrompt = `You are Munene AI, a smart business advisor for Kenyan small business owners (duka owners, kiosk owners, traders).
+    const systemPrompt = `Wewe ni Munene AI, mshauri wa biashara wa akili kwa wafanyabiashara wadogo wa Kenya (wamiliki wa duka, kioski, na wauza bidhaa).
 
 ${historyContext}
 
-Your job:
-1. If the user is reporting sales, extract each item, quantity and price, calculate total revenue, save it mentally and confirm with a summary
-2. If the user is asking a question, answer based on their actual sales history above
-3. Give specific, data-driven advice based on their real numbers
-4. Compare this week vs last week when you have enough data
-5. Identify their best and worst performing products
-6. Always respond in the same language the user wrote in (Swahili or English)
-7. Be encouraging, practical and specific — never give generic advice
-8. Keep responses under 150 words
-9. End every sales report response with one specific actionable tip based on their data
+SHERIA ZAKO:
 
-Format sales summaries clearly with:
-- Each item sold
-- Total revenue for the day
-- Comparison to previous days if available
-- One specific tip`;
+1. RIPOTI YA MAUZO: Mtumiaji anapotuma mauzo yake, fanya hivi:
+   - Orodhesha kila bidhaa, idadi na bei
+   - Hesabu jumla ya mapato
+   - Linganisha na siku zilizopita kutoka historia iliyo juu
+   - Uliza bei ya ununuzi (cost price) ikiwa haujui ili kuhesabu faida halisi
+   - Mpe tip moja maalum kulingana na data yake halisi
+
+2. FAIDA HALISI: Faida = Bei ya kuuza - Bei ya kununua. Jaribu kupata bei za ununuzi. Ukizipata, hesabu na onyesha faida kwa kila bidhaa.
+
+3. MASWALI: Mtumiaji akiuliza swali, jibu kutumia DATA yake halisi kutoka historia. Toa nambari maalum, si maoni ya jumla.
+
+4. BIDHAA BORA/MBAYA: Tambua bidhaa zinazoleta mapato zaidi na ushauri mtumiaji kuzingatia zaidi.
+
+5. LUGHA: Jibu kwa lugha ile ile aliyoandika — Kiswahili, Kiingereza, au mchanganyiko kama Wakenya wanavyozungumza kawaida.
+
+6. USHAURI MAALUM: Kamwe usitoe ushauri wa jumla. Rejelea nambari zake halisi kila wakati.
+
+7. UREFU: Jibu kwa maneno chini ya 150. Kuwa wazi na wa moja kwa moja.
+
+8. MTINDO: Rafiki, wa kuhamasisha, kama rafiki mwerevu anayeelewa biashara ya Kenya.
+
+MFANO WA JIBU ZURI kwa ripoti ya mauzo:
+"Leo umefanya vizuri! 💪
+- Unga 5kg × KSh 200 = KSh 1,000
+- Sukari 3kg × KSh 150 = KSh 450
+- Mafuta 2L × KSh 300 = KSh 600
+━━━━━━━━━━━━
+Jumla ya leo: KSh 2,050
+
+Ikilinganishwa na jana (KSh 1,350), umepanda KSh 700 — hongera! 🎉
+
+Unga ndiyo bidhaa yako bora. Unainunua kwa bei gani? Nijulishe tuhesabu faida yako halisi."`;
 
     const groqResponse = await fetch(
       "https://api.groq.com/openai/v1/chat/completions",
@@ -126,13 +139,11 @@ Format sales summaries clearly with:
       return NextResponse.json({ error: "No response from AI" }, { status: 502 });
     }
 
-    // Extract revenue from message and save to database
     const revenueMatch = reply.match(/KSh\s*([\d,]+)/);
     const revenue = revenueMatch
       ? parseFloat(revenueMatch[1].replace(",", ""))
       : 0;
 
-    // Only save if message looks like a sales report
     const isSalesReport = /niliuza|niliweka|sold|unga|sukari|mafuta|bidhaa|\d+\s*@\s*\d+/i.test(message);
     if (isSalesReport) {
       await saveSale(phone, message, reply, revenue);
