@@ -63,7 +63,7 @@ export default function Home() {
               display: "inline-block",
             }}
           >
-            Jaribu Munene AI →
+          Jaribu Munene AI &#8594;
           </a>
           <div className="hero-trust">
             <div className="hero-trust-item">
